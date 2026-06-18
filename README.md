@@ -6,27 +6,27 @@ A production-ready full-stack application that constructs knowledge graphs from 
 
 ---
 
-## 🚀 Features
+## Features
 
 ### Core Capabilities
 - **Multi-Stage NER Pipeline**: Extract entities (Malware, ThreatActor, Tool, Vulnerability, Campaign, Tactic, Indicator, Location) with pattern-based fallbacks.
-- **Self-Correcting Relation Extraction**: Dual-agent architecture with Generator (LLM) and Validator (Ontology) with feedback loops.
+- **Self-Correcting Relation Extraction**: Dual-agent architecture featuring a Generator (LLM) and Validator (Ontology) with built-in feedback loops.
 - **Ontology Management**: OWL-based validation and reasoning built directly into Next.js.
 - **Neo4j Knowledge Graph**: Persistent storage with Cypher query API.
-- **Interactive Visualization**: D3.js-powered graph exploration with drag-and-drop.
+- **Interactive Visualization**: D3.js-powered graph exploration with drag-and-drop mechanics.
 - **Real-Time Dashboard**: Metrics, statistics, and system monitoring.
 - **Feedback System**: Human-in-the-loop corrections for pipeline improvement.
 
 ### Technical Highlights
-- **Next.js 15** frontend and backend with App Router.
-- **TypeScript** for type safety and compilation verification.
-- **Tailwind CSS** + Shadcn/UI components for sleek styling.
-- **Google Gemini API** (using `gemini-2.5-flash-lite` on the free tier) for extraction.
+- **Next.js 15** frontend and backend using the App Router.
+- **TypeScript** for compile-time type safety and verification.
+- **Tailwind CSS** + Shadcn/UI components for a modern interface.
+- **Google Gemini API** (utilizing `gemini-2.5-flash-lite`) for relationship extraction.
 - **Neo4j** graph database integration.
 
 ---
 
-## 📋 System Architecture
+## System Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -58,7 +58,7 @@ A production-ready full-stack application that constructs knowledge graphs from 
 
 ---
 
-## 🛠️ Installation & Setup
+## Installation and Setup
 
 ### Prerequisites
 - **Node.js** 18+
@@ -112,17 +112,17 @@ npm run dev
 bun dev
 ```
 
-Access application at: **http://localhost:3000**
+Access the application at: **http://localhost:3000**
 
 ---
 
-## 📚 Usage Guide
+## Usage Guide
 
 ### 1. Upload CTI Text
 Navigate to `/upload` and:
-- Paste CTI text directly
-- Upload `.txt` files
-- Click "Load Sample Text" for demo
+- Paste CTI text directly.
+- Upload `.txt` files.
+- Click "Load Sample Text" for a demonstration.
 
 **Example CTI Text:**
 ```
@@ -135,64 +135,64 @@ spear-phishing emails with malicious attachments exploiting CVE-2017-0199.
 
 ### 2. View Extraction Results
 After processing, navigate to `/results` to see:
-- Extracted entities with confidence scores
-- Relation triples (subject → relation → object)
-- Validation status (✓ Valid | ✗ Invalid)
+- Extracted entities with confidence scores.
+- Relation triples (subject -> relation -> object).
+- Validation status (Valid | Invalid).
 
 ### 3. Explore Knowledge Graph
 Navigate to `/graph` for:
-- Interactive visualization
-- Drag nodes to rearrange
-- Click nodes for entity details
-- Color-coded entity types
+- Interactive force-directed visualization.
+- Dragging nodes to rearrange the layout.
+- Clicking nodes for entity details.
+- Color-coded entity types.
 
 ### 4. Monitor Dashboard
 Navigate to `/dashboard` for:
-- Extraction metrics (precision, recall, F1)
-- Entity distribution charts
-- Relation frequency analysis
-- System health logs
+- Extraction metrics (precision, recall, F1).
+- Entity distribution charts.
+- Relation frequency analysis.
+- System health logs.
 
 ---
 
-## 🧬 Ontology Structure
+## Ontology Structure
 
 **Core Classes** (`cygraph.owl`):
 ```
 Malware
-  ├─ uses → Tool
-  ├─ exploits → Vulnerability
-  └─ targets → Location
+  ├─ uses -> Tool
+  ├─ exploits -> Vulnerability
+  └─ targets -> Location
 
 ThreatActor
-  ├─ uses → Malware | Tool
-  ├─ conducts → Campaign
-  └─ operates_in → Location
+  ├─ uses -> Malware | Tool
+  ├─ conducts -> Campaign
+  └─ operates_in -> Location
 
 Tool
-  └─ used_by → ThreatActor | Malware
+  └─ used_by -> ThreatActor | Malware
 
 Vulnerability
-  └─ exploited_by → Malware
+  └─ exploited_by -> Malware
 
 Campaign
-  └─ conducted_by → ThreatActor
+  └─ conducted_by -> ThreatActor
 
 Tactic
-  └─ employed_by → ThreatActor | Campaign
+  └─ employed_by -> ThreatActor | Campaign
 
 Indicator (IOC)
-  └─ associated_with → Malware | Campaign
+  └─ associated_with -> Malware | Campaign
 ```
 
 **Validation Rules:**
-- `uses` valid only between: ThreatActor → Tool/Malware
-- `exploits` valid only between: Malware → Vulnerability
-- `targets` valid only between: ThreatActor/Malware → Location
+- `uses` valid only between: ThreatActor -> Tool/Malware
+- `exploits` valid only between: Malware -> Vulnerability
+- `targets` valid only between: ThreatActor/Malware -> Location
 
 ---
 
-## 🔄 Self-Correcting Pipeline
+## Self-Correcting Pipeline
 
 ### Dual-Agent Architecture
 
@@ -207,7 +207,7 @@ Indicator (IOC)
 
 ### Feedback Loop
 ```
-CTI Text → NER → Triple Generation → Validation
+CTI Text -> NER -> Triple Generation -> Validation
                         ↑                ↓
                         └────── Feedback ←┘
                         (if invalid)
@@ -218,7 +218,7 @@ CTI Text → NER → Triple Generation → Validation
 
 ---
 
-## 📊 API Endpoints
+## API Endpoints
 
 ### Next.js API Routes
 ```
@@ -230,7 +230,7 @@ POST   /api/neo4j/test       # Test database connection handshake
 
 ---
 
-## 🧪 Testing
+## Testing
 
 ### Unit and Type Tests
 ```bash
@@ -241,7 +241,7 @@ npm run build
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 cygraph-extract/
@@ -277,7 +277,7 @@ cygraph-extract/
 
 ---
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - **Neo4j** - Graph database platform
 - **Google AI Studio** - Gemini model access API
