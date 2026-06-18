@@ -178,7 +178,7 @@ export default function GraphPage() {
               Knowledge Graph Visualization
             </h1>
             <Badge variant={source === "neo4j" ? "default" : "secondary"}>
-              {source === "neo4j" ? "Neo4j" : "Local/Sample Data"}
+              {source === "neo4j" ? "Neo4j" : "Given Data"}
             </Badge>
           </div>
           <p className="text-slate-600 dark:text-slate-400">
@@ -214,9 +214,9 @@ export default function GraphPage() {
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle>Interactive Graph</CardTitle>
-                <CardDescription>
-                  Hover over nodes and edges to see details. Click "Seed Sample Data" for best CTI graph example.
-                </CardDescription>
+
+
+
               </div>
             </div>
           </CardHeader>
