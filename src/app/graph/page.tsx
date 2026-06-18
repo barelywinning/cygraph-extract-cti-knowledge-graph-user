@@ -178,7 +178,7 @@ export default function GraphPage() {
               Knowledge Graph Visualization
             </h1>
             <Badge variant={source === "neo4j" ? "default" : "secondary"}>
-              {source === "neo4j" ? "Neo4j" : "Local Storage"}
+              {source === "neo4j" ? "Neo4j" : "Local/Sample Data"}
             </Badge>
           </div>
           <p className="text-slate-600 dark:text-slate-400">

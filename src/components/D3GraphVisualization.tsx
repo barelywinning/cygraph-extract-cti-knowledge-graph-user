@@ -2,12 +2,13 @@
 
 import { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
+import type { SimulationNodeDatum, SimulationLinkDatum } from "d3";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ZoomIn, ZoomOut, Maximize2, RefreshCw } from "lucide-react";
 
-export interface GraphNode extends d3.SimulationNodeDatum {
+export interface GraphNode extends SimulationNodeDatum {
   id: string;
   label: string;
   type: string;
@@ -15,7 +16,7 @@ export interface GraphNode extends d3.SimulationNodeDatum {
   size?: number;
 }
 
-export interface GraphLink extends d3.SimulationLinkDatum<GraphNode> {
+export interface GraphLink extends SimulationLinkDatum<GraphNode> {
   source: string | GraphNode;
   target: string | GraphNode;
   label?: string;

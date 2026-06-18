@@ -157,7 +157,7 @@ class OntologyManager {
       const range = rangeElement?.getAttribute("rdf:resource") || "";
 
       const inverseElement = element.querySelector("owl\\:inverseOf, inverseOf");
-      const inverse = inverseElement?.getAttribute("rdf:resource");
+      const inverse = inverseElement?.getAttribute("rdf:resource") || undefined;
 
       relations.push({
         id,

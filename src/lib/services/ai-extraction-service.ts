@@ -38,7 +38,7 @@ class AIExtractionService {
     const startTime = Date.now();
 
     try {
-      const model = this.genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const model = this.genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
 
       const prompt = `You are a cybersecurity threat intelligence analyst. Extract entity-relation-entity triples from CTI text.
 
@@ -91,7 +91,7 @@ Return only valid JSON, no additional text:`;
       return {
         triples: this.validateTriples(triples),
         metadata: {
-          model: "gemini-1.5-flash",
+          model: "gemini-2.5-flash-lite",
           processingTime,
         },
       };

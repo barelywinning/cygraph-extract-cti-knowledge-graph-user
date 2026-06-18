@@ -12,10 +12,10 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default function SettingsPage() {
   const [config, setConfig] = useState({
-    neo4jUri: "neo4j+s://cbd6a898.databases.neo4j.io",
+    neo4jUri: "",
     neo4jUsername: "neo4j",
-    neo4jPassword: "Dhf-Lc4uNZQpJ8k0l_W61uECGThrhqkiAuozqCmnXOA",
-    geminiApiKey: "AIzaSyDprcLKHVdtRTJLoG_xqx6jFtpwVrFdAvc",
+    neo4jPassword: "",
+    geminiApiKey: "",
   });
   const [saving, setSaving] = useState(false);
   const [testing, setTesting] = useState(false);
@@ -23,20 +23,20 @@ export default function SettingsPage() {
   const [connectionError, setConnectionError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Load saved configuration from localStorage (can override defaults)
     const savedConfig = localStorage.getItem("cygraph-config");
+    let loadedConfig = config;
+
     if (savedConfig) {
-      setConfig(JSON.parse(savedConfig));
-    } else {
-      // Save default credentials to localStorage
-      localStorage.setItem("cygraph-config", JSON.stringify(config));
+      loadedConfig = JSON.parse(savedConfig);
+      setConfig(loadedConfig);
     }
-    
-    // Auto-test connection on mount
-    testConnection();
+
+    if (loadedConfig.neo4jUri && loadedConfig.neo4jUsername && loadedConfig.neo4jPassword) {
+      testConnection(loadedConfig);
+    }
   }, []);
 
-  const testConnection = async () => {
+  const testConnection = async (configToTest = config) => {
     setTesting(true);
     setConnectionError(null);
     try {
@@ -44,9 +44,9 @@ export default function SettingsPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          uri: config.neo4jUri,
-          username: config.neo4jUsername,
-          password: config.neo4jPassword,
+          uri: configToTest.neo4jUri,
+          username: configToTest.neo4jUsername,
+          password: configToTest.neo4jPassword,
         }),
       });
 
@@ -147,13 +147,13 @@ export default function SettingsPage() {
               <AlertTitle>Authentication Failed</AlertTitle>
               <AlertDescription className="space-y-3">
                 <p>
-                  The password doesn't match Neo4j instance <strong>cbd6a898</strong>.
+                  The current Neo4j credentials were rejected by the configured instance.
                 </p>
                 <div className="space-y-2 text-sm">
                   <p className="font-semibold">To get the correct password:</p>
                   <ol className="list-decimal list-inside space-y-1 ml-2">
                     <li>Go to <a href="https://console.neo4j.io" target="_blank" rel="noopener noreferrer" className="underline inline-flex items-center gap-1">console.neo4j.io <ExternalLink className="h-3 w-3" /></a></li>
-                    <li>Find instance "Instance02" (cbd6a898)</li>
+                    <li>Find the database that matches your connection URI</li>
                     <li>Click the ⋮ menu → "Reset password"</li>
                     <li>Copy the new password and paste it below</li>
                     <li>Click "Test Connection"</li>
@@ -171,7 +171,7 @@ export default function SettingsPage() {
                 <CardTitle>Neo4j Database</CardTitle>
               </div>
               <CardDescription>
-                Instance cbd6a898 (Instance02)
+                  Configure your Neo4j connection details from environment variables or local storage
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -184,7 +184,7 @@ export default function SettingsPage() {
                   onChange={(e) => setConfig({ ...config, neo4jUri: e.target.value })}
                 />
                 <p className="text-xs text-slate-500">
-                  Instance: Instance02 (cbd6a898)
+                  Loaded from local environment or browser storage
                 </p>
               </div>
 
@@ -203,13 +203,13 @@ export default function SettingsPage() {
                 <Input
                   id="neo4j-password"
                   type="password"
-                  placeholder="Enter your Neo4j password for instance cbd6a898"
+                  placeholder="Enter your Neo4j password"
                   value={config.neo4jPassword}
                   onChange={(e) => setConfig({ ...config, neo4jPassword: e.target.value })}
                 />
                 {isAuthError && (
                   <p className="text-xs text-destructive">
-                    ⚠️ This password is for a different instance. Please reset the password for cbd6a898.
+                    ⚠️ The current credentials were rejected by Neo4j. Update your local environment or storage.
                   </p>
                 )}
               </div>
@@ -233,7 +233,7 @@ export default function SettingsPage() {
                 <CardTitle>Google Gemini API</CardTitle>
               </div>
               <CardDescription>
-                AI-powered relation extraction configured and ready
+                Provide a Gemini API key in local storage or your environment for AI-powered extraction
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -242,7 +242,7 @@ export default function SettingsPage() {
                 <Input
                   id="gemini-key"
                   type="password"
-                  placeholder="AIza..."
+                  placeholder="Enter your Gemini API key"
                   value={config.geminiApiKey}
                   onChange={(e) => setConfig({ ...config, geminiApiKey: e.target.value })}
                 />

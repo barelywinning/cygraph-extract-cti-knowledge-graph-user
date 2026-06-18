@@ -1,25 +1,48 @@
 import { NextRequest, NextResponse } from "next/server";
 import { neo4jService } from "@/lib/services/neo4j-service";
 
+function getConfigFromRequest(request: NextRequest) {
+  const headerConfig = request.headers.get("x-neo4j-config");
+  if (headerConfig) {
+    try {
+      const parsed = JSON.parse(headerConfig);
+      return {
+        uri: parsed.uri || "",
+        username: parsed.username || "neo4j",
+        password: parsed.password || "",
+        database: parsed.database || process.env.NEO4J_DATABASE || "neo4j",
+      };
+    } catch {
+      return null;
+    }
+  }
+
+  return {
+    uri: process.env.NEO4J_URI || "",
+    username: process.env.NEO4J_USERNAME || "",
+    password: process.env.NEO4J_PASSWORD || "",
+    database: process.env.NEO4J_DATABASE || "neo4j",
+  };
+}
+
 export async function GET(request: NextRequest) {
   try {
-    const neo4jConfig = {
-      uri: process.env.NEO4J_URI || "",
-      username: process.env.NEO4J_USERNAME || "",
-      password: process.env.NEO4J_PASSWORD || "",
-      database: process.env.NEO4J_DATABASE || "neo4j",
-    };
+    const neo4jConfig = getConfigFromRequest(request);
 
-    if (!neo4jConfig.uri || !neo4jConfig.username || !neo4jConfig.password) {
+    if (!neo4jConfig?.uri || !neo4jConfig.username || !neo4jConfig.password) {
       return NextResponse.json(
         { success: false, error: "Neo4j configuration missing" },
         { status: 500 }
       );
     }
 
-    neo4jService.connect(neo4jConfig);
-    const graphData = await neo4jService.queryGraph();
-    await neo4jService.close();
+    let graphData;
+    try {
+      neo4jService.connect(neo4jConfig);
+      graphData = await neo4jService.queryGraph();
+    } finally {
+      await neo4jService.close();
+    }
 
     // Transform to graph visualization format
     const transformedData = {
@@ -62,7 +85,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const neo4jConfig = config || {
+    const neo4jConfig = config || getConfigFromRequest(request) || {
       uri: process.env.NEO4J_URI || "",
       username: process.env.NEO4J_USERNAME || "",
       password: process.env.NEO4J_PASSWORD || "",
@@ -76,9 +99,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    neo4jService.connect(neo4jConfig);
-    const result = await neo4jService.executeCypher(query, params);
-    await neo4jService.close();
+    let result;
+    try {
+      neo4jService.connect(neo4jConfig);
+      result = await neo4jService.executeCypher(query, params);
+    } finally {
+      await neo4jService.close();
+    }
     
     return NextResponse.json({ success: true, data: result });
   } catch (error: any) {

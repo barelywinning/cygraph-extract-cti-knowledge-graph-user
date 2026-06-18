@@ -32,7 +32,7 @@ const entityDistribution = [
 ];
 
 const systemHealth = [
-  { component: "FastAPI Backend", status: "operational", uptime: 99.8, latency: 45 },
+  { component: "Next.js API Server", status: "operational", uptime: 99.9, latency: 15 },
   { component: "Neo4j Database", status: "operational", uptime: 99.9, latency: 12 },
   { component: "NER Pipeline", status: "operational", uptime: 98.5, latency: 230 },
   { component: "Ontology Service", status: "operational", uptime: 99.7, latency: 67 },
@@ -218,7 +218,7 @@ export default function DashboardPage() {
                         cx="50%"
                         cy="50%"
                         labelLine={false}
-                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                        label={({ name, percent }: { name?: string; percent?: number }) => `${name || ""} ${((percent ?? 0) * 100).toFixed(0)}%`}
                         outerRadius={120}
                         fill="#8884d8"
                         dataKey="value"

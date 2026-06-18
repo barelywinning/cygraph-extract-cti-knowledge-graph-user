@@ -11,20 +11,8 @@ import Link from "next/link";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
 import { useRouter } from "next/navigation";
-import * as pdfjsLib from "pdfjs-dist";
 import mammoth from "mammoth";
 import { toast } from "sonner";
-
-// Configure PDF.js worker with multiple fallback strategies
-if (typeof window !== "undefined") {
-  // Try jsdelivr with .mjs extension (better for ESM)
-  pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.mjs`;
-  
-  // Alternative: If the above fails, you can also try:
-  // pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.mjs`;
-  // or for legacy:
-  // pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
-}
 
 export default function UploadPage() {
   const [text, setText] = useState("");
@@ -37,6 +25,9 @@ export default function UploadPage() {
   const router = useRouter();
 
   const extractTextFromPDF = async (file: File): Promise<string> => {
+    const pdfjsLib = await import("pdfjs-dist");
+    pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.mjs`;
+
     const arrayBuffer = await file.arrayBuffer();
     const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
     let fullText = "";

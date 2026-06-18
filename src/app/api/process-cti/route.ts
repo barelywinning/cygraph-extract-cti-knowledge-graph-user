@@ -17,8 +17,18 @@ export async function POST(request: NextRequest) {
     const startTime = Date.now();
 
     // Get configuration (Neo4j + Gemini)
-    const neo4jConfig = config?.neo4j;
-    const geminiKey = config?.gemini;
+    const envNeo4jConfig =
+      process.env.NEO4J_URI && process.env.NEO4J_PASSWORD
+        ? {
+            uri: process.env.NEO4J_URI,
+            username: process.env.NEO4J_USERNAME || "neo4j",
+            password: process.env.NEO4J_PASSWORD,
+            database: process.env.NEO4J_DATABASE || "neo4j",
+          }
+        : undefined;
+    const neo4jConfig = config?.neo4j || envNeo4jConfig;
+    const geminiKey = config?.gemini || process.env.GEMINI_API_KEY;
+    let extractionMethod = "pattern-based";
 
     // Step 1: Extract triples using AI or fallback to pattern-based
     let extractionResult;
@@ -27,6 +37,7 @@ export async function POST(request: NextRequest) {
       try {
         aiExtractionService.initialize(geminiKey);
         extractionResult = await aiExtractionService.extractTriples(text);
+        extractionMethod = "ai";
       } catch (error) {
         console.warn("AI extraction failed, falling back to pattern-based:", error);
         extractionResult = aiExtractionService.extractTriplesPattern(text);
@@ -95,6 +106,8 @@ export async function POST(request: NextRequest) {
       } catch (error) {
         console.error("Neo4j storage failed:", error);
         // Continue without Neo4j storage
+      } finally {
+        await neo4jService.close();
       }
     }
 
@@ -130,7 +143,7 @@ export async function POST(request: NextRequest) {
         total_entities: entities.length,
         total_relations: relations.length,
         neo4j_stored: neo4jStored,
-        extraction_method: geminiKey ? "ai" : "pattern-based",
+        extraction_method: extractionMethod,
       },
     });
   } catch (error: any) {

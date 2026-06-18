@@ -21,6 +21,11 @@ export interface Neo4jRelationship {
   properties: Record<string, any>;
 }
 
+const stripQuotes = (val: string | undefined): string => {
+  if (!val) return "";
+  return val.trim().replace(/^["']|["']$/g, "").trim();
+};
+
 class Neo4jService {
   private driver: Driver | null = null;
 
@@ -29,10 +34,14 @@ class Neo4jService {
    */
   connect(config: Neo4jConfig): void {
     try {
+      const uri = stripQuotes(config.uri);
+      const username = stripQuotes(config.username);
+      const password = stripQuotes(config.password);
+
       // For Neo4j Aura (neo4j+s://), use simple connection without extra config
       this.driver = neo4j.driver(
-        config.uri,
-        neo4j.auth.basic(config.username, config.password),
+        uri,
+        neo4j.auth.basic(username, password),
         {
           maxConnectionPoolSize: 50,
           connectionAcquisitionTimeout: 60000,
@@ -61,10 +70,14 @@ class Neo4jService {
     let tempDriver: Driver | null = null;
     let session: Session | null = null;
     try {
+      const uri = stripQuotes(config.uri);
+      const username = stripQuotes(config.username);
+      const password = stripQuotes(config.password);
+
       // Create driver for Neo4j Aura
       tempDriver = neo4j.driver(
-        config.uri,
-        neo4j.auth.basic(config.username, config.password),
+        uri,
+        neo4j.auth.basic(username, password),
         {
           maxConnectionPoolSize: 50,
           connectionAcquisitionTimeout: 60000,
@@ -187,10 +200,13 @@ class Neo4jService {
         MATCH (n:Entity)
         OPTIONAL MATCH (n)-[r:RELATES]->(m:Entity)
         RETURN n, r, m
-        LIMIT 200
+        LIMIT $limit
       `;
 
-      const result = await session.run(query, params || {});
+      const result = await session.run(query, {
+        limit: params?.limit ?? 200,
+        ...(params || {}),
+      });
       
       const nodes: Neo4jNode[] = [];
       const relationships: Neo4jRelationship[] = [];

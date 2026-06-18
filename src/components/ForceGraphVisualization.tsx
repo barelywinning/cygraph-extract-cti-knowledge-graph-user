@@ -44,7 +44,7 @@ export default function ForceGraphVisualization({
   width = 1200,
   height = 600,
 }: ForceGraphVisualizationProps) {
-  const fgRef = useRef<any>();
+  const fgRef = useRef<any>(null);
   const [highlightNodes, setHighlightNodes] = useState(new Set());
   const [highlightLinks, setHighlightLinks] = useState(new Set());
   const [hoverNode, setHoverNode] = useState<any>(null);
