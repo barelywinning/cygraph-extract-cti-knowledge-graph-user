@@ -75,12 +75,20 @@ Return only valid JSON, no additional text:`;
       const response = await result.response;
       const responseText = response.text();
       
-      // Extract JSON from response (handle markdown code blocks)
+      // Extract JSON from response (handle markdown code blocks and surrounding text)
       let jsonText = responseText.trim();
-      if (jsonText.startsWith("```json")) {
-        jsonText = jsonText.replace(/^```json\n/, "").replace(/\n```$/, "");
-      } else if (jsonText.startsWith("```")) {
-        jsonText = jsonText.replace(/^```\n/, "").replace(/\n```$/, "");
+      
+      // Try extracting content inside ```json ... ``` or ``` ... ``` code blocks
+      const codeBlockMatch = jsonText.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
+      if (codeBlockMatch) {
+        jsonText = codeBlockMatch[1].trim();
+      }
+      
+      // Fallback: Find the first '{' and last '}' to strip any surrounding conversational text
+      const firstBrace = jsonText.indexOf("{");
+      const lastBrace = jsonText.lastIndexOf("}");
+      if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+        jsonText = jsonText.substring(firstBrace, lastBrace + 1);
       }
       
       const parsed = JSON.parse(jsonText);
