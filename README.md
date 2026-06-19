@@ -110,11 +110,7 @@ GEMINI_API_KEY=your_gemini_api_key
 npm run dev
 # or
 bun dev
-```
 
-Access the application at: **http://localhost:3000**
-
----
 
 ## Usage Guide
 
