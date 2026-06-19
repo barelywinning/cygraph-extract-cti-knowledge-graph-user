@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Save, Database, Key, AlertTriangle, CheckCircle, ExternalLink } from "lucide-react";
+import { ArrowLeft, Save, Database, Key, AlertTriangle, CheckCircle, ExternalLink, Lock } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -21,8 +21,13 @@ export default function SettingsPage() {
   const [testing, setTesting] = useState(false);
   const [connected, setConnected] = useState(false);
   const [connectionError, setConnectionError] = useState<string | null>(null);
+  const [isProduction, setIsProduction] = useState(false);
 
   useEffect(() => {
+    if (process.env.NODE_ENV === "production") {
+      setIsProduction(true);
+      return;
+    }
     const savedConfig = localStorage.getItem("cygraph-config");
     let loadedConfig = config;
 
@@ -35,6 +40,52 @@ export default function SettingsPage() {
       testConnection(loadedConfig);
     }
   }, []);
+
+  if (isProduction) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 flex items-center justify-center p-4">
+        <Card className="max-w-md w-full border-2 border-amber-200 dark:border-amber-950">
+          <CardHeader className="text-center">
+            <div className="mx-auto bg-amber-100 dark:bg-amber-900/30 p-3 rounded-full w-14 h-14 flex items-center justify-center mb-4">
+              <Lock className="h-7 w-7 text-amber-600 dark:text-amber-400" />
+            </div>
+            <CardTitle className="text-2xl font-bold">Access Restricted</CardTitle>
+            <CardDescription className="mt-2 text-slate-600 dark:text-slate-400">
+              Interactive credential configuration is disabled in public production mode for security.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-slate-500 leading-relaxed text-center">
+              Please supply your database connection and API credentials using target system environment variables instead:
+            </p>
+            <div className="bg-slate-100 dark:bg-slate-900 p-4 rounded-lg font-mono text-xs space-y-1.5 border border-slate-200 dark:border-slate-800">
+              <div className="flex justify-between text-slate-700 dark:text-slate-300">
+                <span>NEO4J_URI</span>
+                <span className="text-indigo-600 dark:text-indigo-400 font-semibold">Required</span>
+              </div>
+              <div className="flex justify-between text-slate-700 dark:text-slate-300">
+                <span>NEO4J_USERNAME</span>
+                <span className="text-slate-500">Optional ("neo4j")</span>
+              </div>
+              <div className="flex justify-between text-slate-700 dark:text-slate-300">
+                <span>NEO4J_PASSWORD</span>
+                <span className="text-indigo-600 dark:text-indigo-400 font-semibold">Required</span>
+              </div>
+              <div className="flex justify-between text-slate-700 dark:text-slate-300">
+                <span>GEMINI_API_KEY</span>
+                <span className="text-indigo-600 dark:text-indigo-400 font-semibold">Required</span>
+              </div>
+            </div>
+            <div className="pt-2">
+              <Link href="/" className="block">
+                <Button className="w-full">Return to Dashboard</Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   const testConnection = async (configToTest = config) => {
     setTesting(true);
